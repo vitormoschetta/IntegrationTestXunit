@@ -1,7 +1,7 @@
 namespace IntegrationTest.Tests;
-[Collection("IntegrationTest")]
+[Collection("IntegrationTestCollection")]
 [TestCaseOrderer("IntegrationTest.Helpers.AlphabeticalOrderer", "IntegrationTest")]
-public class IntegrationTest2 : IClassFixture<ContextFixture>
+public class IntegrationTest2
 {
     ContextFixture _fixture;
 
@@ -28,7 +28,7 @@ public class IntegrationTest2 : IClassFixture<ContextFixture>
     {
         Console.WriteLine("IntegrationTest2.Test2 | ThreadId: {0}", Thread.CurrentThread.ManagedThreadId);
 
-        var todo = new TodoItem("Test Todo");
+        var todo = new TodoItem("Test Todo 2");
         var content = new StringContent(JsonConvert.SerializeObject(todo), Encoding.UTF8, "application/json");
         var response = await _fixture.HttpClient.PostAsync("v1/todos", content);
 
@@ -46,9 +46,8 @@ public class IntegrationTest2 : IClassFixture<ContextFixture>
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Single(todos);
-        Assert.Equal("Test Todo", todos.First().Title);
+        Assert.Equal("Test Todo 2", todos.First().Title);
     }
-
 
     [Fact]
     public async Task Test4()
@@ -58,6 +57,15 @@ public class IntegrationTest2 : IClassFixture<ContextFixture>
         var todos = await _fixture.DbConnection.QueryAsync<TodoItem>("SELECT * FROM \"Todos\"");
 
         Assert.Single(todos);
-        Assert.Equal("Test Todo", todos.First().Title);
+        Assert.Equal("Test Todo 2", todos.First().Title);
+    }
+
+    [Fact]
+    public void Test5()
+    {
+        Console.WriteLine("IntegrationTest2.Test5 | ThreadId: {0}", Thread.CurrentThread.ManagedThreadId);
+
+        var response = _fixture.DbConnection.Execute("DELETE FROM \"Todos\" where \"Title\" = 'Test Todo 2'");
+        Assert.Equal(1, response);
     }
 }
